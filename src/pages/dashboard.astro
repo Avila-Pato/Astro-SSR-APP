@@ -6,25 +6,60 @@ import { CloudUpload } from "lucide-react";
 import "../styles/global.css";
 
 const currentUser = Astro.locals.user;
-
-
 ---
 
 <Layout>
-    <main class="flex flex-col items-center gap-2">
-        <img src={currentUser?.image} alt="Imagen de usuario" class="w-20 h-20 rounded-full">
-        <h1 class="text-4xl text-base-content brightness-150 font-bold">Tu Dashboard</h1>
-        <p>Eliminar una imagen y revisar Tus Post gustados</p>
-
-        <CldUploadWidget uploadPreset="astroUpload" signatureEndpoint="/api/signed">
-     
-                <button class="btn btn-accent" >
+    <main>
+        <section class="flex flex-col items-center gap-2">
+            <img src={currentUser?.image} alt="Imagen de usuario" class="w-20 h-20 rounded-full">
+            <h1 class="text-4xl text-base-content brightness-150 font-bold">Tu Dashboard</h1>
+            <p>Eliminar una imagen y revisar Tus Post gustados</p>
+            <CldUploadWidget uploadPreset="astroUpload" signatureEndpoint="/api/signed" id="upload_events">
+                <button class="btn btn-accent">
                     <div class="flex items-center gap-2">
                         <p>Subir imagen</p>
                         <CloudUpload size={24} />
                     </div>
                 </button>
-                
-        </CldUploadWidget>
+            </CldUploadWidget>
+        </section>
     </main>
 </Layout>
+
+<script>
+    import { actions } from 'astro:actions';
+
+    // Define el tipo del evento personalizado
+    interface CloudinaryUploadEvent extends CustomEvent {
+        detail: {
+            info: {
+                public_id: string;
+                format: string;
+            };
+        };
+    }
+
+    const widget = document.querySelector("#upload_events");
+    if (widget) {
+        widget.addEventListener("clduploadwidget:success", async (e: Event) => {
+            // Haz un cast del evento a CloudinaryUploadEvent
+            const event = e as CloudinaryUploadEvent;
+
+            const imageUrl = event.detail.info.public_id;
+            const format = event.detail.info.format;
+
+            const { data, error } = await actions.addImage({
+                format,
+                publicId: imageUrl,
+            });
+
+            if (error) {
+                console.log(error);
+            }
+            if (data) {
+                console.log(data);
+                window.location.href = "/dashboard";
+            }
+        });
+    }
+</script>

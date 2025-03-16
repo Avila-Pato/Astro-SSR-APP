@@ -57,7 +57,7 @@ export const userImage = pgTable("user_image", {
 id: text("id").primaryKey(),
 userId: text('user_id')
 .notNull()
-.references(()=> user.id, { onDelete: 'cascade' }),
+.references(()=> user.id ),
 url: text('url').notNull(),
 format: text('format').default('jpg'),
 descriptions: text('descriptions'),

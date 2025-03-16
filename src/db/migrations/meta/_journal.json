@@ -15,6 +15,13 @@
       "when": 1742092619364,
       "tag": "0001_friendly_rage",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1742154759621,
+      "tag": "0002_orange_bushwacker",
+      "breakpoints": true
     }
   ]
 }
