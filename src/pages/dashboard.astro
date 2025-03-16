@@ -1,0 +1,30 @@
+---
+// import { db } from "..db";
+import Layout from "../layouts/Layout.astro";
+import { CldUploadWidget } from "astro-cloudinary";
+import { CloudUpload } from "lucide-react";
+import "../styles/global.css";
+
+const currentUser = Astro.locals.user;
+
+
+---
+
+<Layout>
+    <main class="flex flex-col items-center gap-2">
+        <img src={currentUser?.image} alt="Imagen de usuario" class="w-20 h-20 rounded-full">
+        <h1 class="text-4xl text-base-content brightness-150 font-bold">Tu Dashboard</h1>
+        <p>Eliminar una imagen y revisar Tus Post gustados</p>
+
+        <CldUploadWidget uploadPreset="astroUpload" signatureEndpoint="/api/signed">
+     
+                <button class="btn btn-accent" >
+                    <div class="flex items-center gap-2">
+                        <p>Subir imagen</p>
+                        <CloudUpload size={24} />
+                    </div>
+                </button>
+                
+        </CldUploadWidget>
+    </main>
+</Layout>
