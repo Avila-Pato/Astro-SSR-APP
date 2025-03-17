@@ -26,7 +26,8 @@ export const auth = betterAuth({
     },
     trustedOrigins: [
         "http://localhost:4321",  // Asegúrate de agregar este valor aquí
-        "http://localhost:4221"   // Este ya está por defecto, mantenlo si es necesario
+        "http://localhost:4322",
+        "http://localhost:4323"   // Este ya está por defecto, mantenlo si es necesario
     ] 
  
 });

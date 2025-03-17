@@ -1,11 +1,24 @@
 ---
-// import { db } from "..db";
+import { db } from "../db";
+import {eq} from "drizzle-orm";
 import Layout from "../layouts/Layout.astro";
 import { CldUploadWidget } from "astro-cloudinary";
 import { CloudUpload } from "lucide-react";
 import "../styles/global.css";
+import { userImage } from "../db/schema"
+import  Post  from "../components/post.astro";
 
 const currentUser = Astro.locals.user;
+
+
+if(!db) {
+    throw new Error('La base de datos no esta inicializada');
+}
+
+const images = await db.query.userImage.findMany({
+    where:  eq(userImage.userId, currentUser?.id!),
+    with: {likes: true, user: true, comments: true}
+})
 ---
 
 <Layout>
@@ -22,6 +35,14 @@ const currentUser = Astro.locals.user;
                     </div>
                 </button>
             </CldUploadWidget>
+        </section>
+        <section class="card">
+            <h2 class="pb-4 text-3xl">Ver mis Post</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {images.length === 0 ? (<p>No hay imagenes</p>) : images.map((post) => <Post imgData={post} 
+            currentUser={currentUser}/>)}
+
+            </div>
         </section>
     </main>
 </Layout>
