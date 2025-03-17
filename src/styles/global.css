@@ -1,3 +1,10 @@
 @import "tailwindcss";
 
 @plugin "daisyui";
+
+.Public {
+    color: green;
+}
+.Private {
+    color: red;
+}

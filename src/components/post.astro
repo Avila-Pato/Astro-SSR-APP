@@ -5,6 +5,7 @@ import type { AstroClientDirectives } from 'astro';
 import { getCldImageUrl , getCldVideoUrl } from "astro-cloudinary/helpers";
 import { CldImage } from 'astro-cloudinary';
 import  HeartLike  from "../components/heart-like";
+import Visibility from './visibility';
 
 
 type Props = {
@@ -60,7 +61,9 @@ const cldVideoPreview = getCldVideoUrl({
   <!-- Coraxion para los likes -->
   <div class="flex items-center gap-6 pt-4">
     <HeartLike client:load imgData={img} currentUser={currentUser} />
-</>
+            <!--Visibilidad de las img si el usaurio esta logeado  -->
+    <Visibility client:load imgData={img} currentUser={currentUser} />
+<div/>
 </div>
 
 <script>

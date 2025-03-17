@@ -4,6 +4,7 @@ import { db } from "../db";
 import { imageLike, userImage } from "../db/schema";
 import { createId } from "@paralleldrive/cuid2";
 import { and, eq } from "drizzle-orm";
+import Visibility from "../components/visibility";
 
 export const server = {
     addImage: defineAction({
@@ -108,4 +109,49 @@ export const server = {
             }
         }
     }),
+    toggleVisibility: defineAction({
+        input: z.object({
+            imageId: z.string(),
+        }),
+        handler: async ({ imageId }, context) => {
+            const currentUser = context.locals.user?.id;
+            if(!currentUser) {
+                throw new Error('Usuario no encontrado');
+            }
+
+            if(!db) {
+                throw new Error('La base de datos no se esta inicializada');
+            }
+
+            try {
+                const existingImage = await db.query.userImage.findFirst({
+                    where: and((
+                        eq(userImage.id, imageId),
+                        eq(userImage.userId, currentUser)
+                    )),
+                })
+
+                if(!existingImage) {
+                    throw new Error('Imagen no encontrada o no autorizada');
+                }
+
+                // Actualizando  la visibilidad de la imagen
+                const updateImage = await db
+                .update(userImage)
+                .set({
+                    visibility: !existingImage.visibility,
+                })
+                .where(eq(userImage.id, imageId))
+                .returning();
+                console.log("Visibilidad actualizada:", updateImage[0].visibility)
+                return {
+                    success: true,
+                    visibility: updateImage[0].visibility
+                }
+            } catch (error) {
+                console.error("Error al crear la imagen:", error);
+                throw new Error('Error al crear la imagen');
+            }
+        }
+    })
 }
