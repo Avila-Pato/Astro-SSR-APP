@@ -1,8 +1,9 @@
 import { defineAction } from "astro:actions";
 import { z } from "astro:schema";
 import { db } from "../db";
-import { userImage } from "../db/schema";
+import { imageLike, userImage } from "../db/schema";
 import { createId } from "@paralleldrive/cuid2";
+import { and, eq } from "drizzle-orm";
 
 export const server = {
     addImage: defineAction({
@@ -50,5 +51,61 @@ export const server = {
                 throw new Error('Error al crear la imagen');
             }
         },
-    })
-};
+    }),
+
+    // manejando si el usuario le gusto la imagen 
+    likeImage: defineAction({
+        input: z.object({
+            imageId: z.string()
+        }),
+        handler: async ({ imageId }, context) => {
+            const currentUser = context.locals.user?.id;
+            if (!currentUser) {
+                throw new Error('Usuario no encontrado');
+            }
+
+            if(!db) {
+                throw new Error('La base de datos no se esta inicializada');
+            }
+
+            try {
+                const existingLike = await db.query.imageLike.findFirst({
+                    where: and(
+                        eq(imageLike.userId, currentUser),
+                        eq(imageLike.imageId, imageId)
+                        ),
+                })
+                if(existingLike) {
+                    // Remueve los likes
+                    const deleteLike = await db
+                    .delete(imageLike)
+                    .where(
+                        and(
+                            eq(imageLike.userId, currentUser),
+                            eq(imageLike.imageId, imageId)
+                        )
+                    )
+                    .returning();
+                    return { success: deleteLike[0]}
+                } else {
+                    // Agrega los likes
+                    const newLike = await db
+                    .insert(imageLike)
+                    .values({
+                        id: createId(),
+                        userId: currentUser,
+                        imageId: imageId,
+                        // createdAt: new Date(),
+                        // updatedAt: new Date(),
+                    })
+                    .returning();
+                    return { success: newLike[0]}
+                }
+            } catch (error) {
+                console.error("Error al crear la imagen:", error);
+                throw new Error('Error al crear la imagen');
+                
+            }
+        }
+    }),
+}

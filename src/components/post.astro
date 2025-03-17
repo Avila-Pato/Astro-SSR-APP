@@ -4,6 +4,7 @@ import type { TImagePost } from '../lib/infer-type';
 import type { AstroClientDirectives } from 'astro';
 import { getCldImageUrl , getCldVideoUrl } from "astro-cloudinary/helpers";
 import { CldImage } from 'astro-cloudinary';
+import  HeartLike  from "../components/heart-like";
 
 
 type Props = {
@@ -51,10 +52,15 @@ const cldVideoPreview = getCldVideoUrl({
             ) : (
             <CldImage
              src={getCldImageUrl({src:img.url})} 
+             alt={img.descriptions}
             />
             )
         }
   </div>
+  <!-- Coraxion para los likes -->
+  <div class="flex items-center gap-6 pt-4">
+    <HeartLike client:load imgData={img} currentUser={currentUser} />
+</>
 </div>
 
 <script>
